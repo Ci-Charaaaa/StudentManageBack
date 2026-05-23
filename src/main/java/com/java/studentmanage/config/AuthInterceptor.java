@@ -9,21 +9,23 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
 
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //对每次操作前浏览器发送的预检直接放行
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
 
-        String token = request.getHeader("Authorization");
-        if (token == null || token.isEmpty()) {
+        String token = request.getHeader("Authorization"); //拿请求头
+        if (token == null || token.isEmpty()) { //无请求头error回41
             response.setStatus(401);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"msg\":\"未登录或token已过期\",\"data\":null}");
             return false;
         }
         try {
-            JwtUtil.parse(token);
+            JwtUtil.parse(token); //解析并验证签名和过期时间
             return true;
-        } catch (Exception e) {
+        } catch (Exception e) { //失败依然抛出401
             response.setStatus(401);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"msg\":\"token无效或已过期\",\"data\":null}");
