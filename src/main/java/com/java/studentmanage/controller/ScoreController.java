@@ -14,6 +14,7 @@ public class ScoreController {
     @Autowired
     private ScoreService scoreService;
 
+    //和学生一样，只是调用的方法换成自定义的多表联查的方法，这里的两个外键传参是用于跳转详情页时获取学生/课程表的data的
     @GetMapping
     public R<?> list(
             @RequestParam(defaultValue = "1") int page,
@@ -27,6 +28,7 @@ public class ScoreController {
         return R.ok(scoreService.page(page, pageSize, studentName, courseName, semester, examType, studentId, courseId));
     }
 
+    //后面和学生一样CRUD
     @GetMapping("/{id}")
     public R<?> get(@PathVariable Long id) {
         ScoreVo vo = scoreService.getById(id);

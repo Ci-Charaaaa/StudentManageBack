@@ -15,20 +15,25 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    //登录
     @PostMapping("/login")
     public R<?> login(@RequestBody Map<String, String> body) {
         String username = body.get("username");
         String password = body.get("password");
+
         if (username == null || password == null) {
             return R.error("用户名或密码不能为空");
         }
+
         Map<String, Object> result = userService.login(username, password);
+
         if (result == null) {
             return R.error("用户名或密码错误");
         }
         return R.ok(result);
     }
 
+    //注册
     @PostMapping("/register")
     public R<?> register(@RequestBody User user) {
         if (user.getUsername() == null || user.getUsername().length() < 3 || user.getUsername().length() > 20) {

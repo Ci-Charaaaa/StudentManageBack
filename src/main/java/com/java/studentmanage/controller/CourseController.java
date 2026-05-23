@@ -14,6 +14,7 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
+    //与学生类是一样的
     @GetMapping
     public R<?> list(
             @RequestParam(defaultValue = "1") int page,

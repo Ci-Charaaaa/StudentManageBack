@@ -14,6 +14,7 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    //分页条件查询，调用学生服务类的方法
     @GetMapping
     public R<?> list(
             @RequestParam(defaultValue = "1") int page,
@@ -22,19 +23,24 @@ public class StudentController {
             @RequestParam(required = false) String studentNo,
             @RequestParam(required = false) String className,
             @RequestParam(required = false) String gender) {
+
         Page<Student> p = studentService.page(page, pageSize, name, studentNo, className, gender);
         return R.ok(p);
     }
 
+    //根据id调用学生服务类b中由aseMapper填充的查方法去查单个学生
     @GetMapping("/{id}")
     public R<?> get(@PathVariable Long id) {
+
         Student student = studentService.getById(id);
         if (student == null) return R.error("学生不存在");
         return R.ok(student);
     }
 
+    //新增学生
     @PostMapping
     public R<?> add(@RequestBody Student student) {
+
         if (student.getStudentNo() == null || student.getStudentNo().isEmpty()) return R.error("学号不能为空");
         if (student.getName() == null || student.getName().length() < 2 || student.getName().length() > 20)
             return R.error("姓名长度需在2-20之间");
@@ -46,17 +52,21 @@ public class StudentController {
         if (student.getPhone() != null && !student.getPhone().isEmpty()
                 && !student.getPhone().matches("1[3-9]\\d{9}"))
             return R.error("手机号格式不正确");
+
         boolean ok = studentService.save(student);
         return ok ? R.ok() : R.error("添加失败");
     }
 
+    //修改
     @PutMapping("/{id}")
     public R<?> update(@PathVariable Long id, @RequestBody Student student) {
+
         student.setId(id);
         boolean ok = studentService.update(student);
         return ok ? R.ok() : R.error("修改失败");
     }
 
+    //删除
     @DeleteMapping("/{id}")
     public R<?> delete(@PathVariable Long id) {
         boolean ok = studentService.delete(id);

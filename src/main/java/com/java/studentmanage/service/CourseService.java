@@ -13,6 +13,7 @@ public class CourseService {
     @Autowired
     private CourseMapper courseMapper;
 
+    //和学生的分页是一样的
     public Page<Course> page(int page, int pageSize, String name, String courseNo, String teacher) {
         Page<Course> p = new Page<>(page, pageSize);
         QueryWrapper<Course> qw = new QueryWrapper<>();

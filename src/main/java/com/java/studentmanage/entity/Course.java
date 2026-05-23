@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 @TableName("course")
 public class Course {
+    //依旧主键..
     @TableId(type = IdType.AUTO)
     private Long id;
     private String courseNo;

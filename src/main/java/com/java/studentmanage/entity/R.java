@@ -1,8 +1,11 @@
 package com.java.studentmanage.entity;
 
 public class R<T> {
+    //状态码: 200成功, 500错误, 401未登录
     private int code;
+    //提示信息
     private String msg;
+    //数据
     private T data;
 
     public R() {}
@@ -13,6 +16,7 @@ public class R<T> {
         this.data = data;
     }
 
+    //提供统一的返回格式，即code,msg,data
     public static <T> R<T> ok(T data) {
         return new R<>(200, "success", data);
     }

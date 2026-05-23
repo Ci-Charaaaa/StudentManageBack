@@ -18,6 +18,7 @@ public class VisualizationController {
 
     @GetMapping("/visualization")
     public R<?> visualization() {
+        //把数据打包成json给前端调用画表
         Map<String, Object> data = new HashMap<>();
         data.put("studentTrend", getStudentTrend());
         data.put("studentCumulative", getStudentCumulative());
@@ -28,33 +29,48 @@ public class VisualizationController {
         return R.ok(data);
     }
 
+    //提供学生趋势表的data
     private Map<String, List<String>> getStudentTrend() {
+
         List<String> labels = new ArrayList<>();
         List<String> values = new ArrayList<>();
+
+        //收集过去12个月的学生新增信息
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
                 "SELECT DATE_FORMAT(create_time, '%Y-%m') AS m, COUNT(*) AS cnt FROM student " +
                 "WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH) " +
                 "GROUP BY m ORDER BY m");
+
+        //从列表里安月份和数量给它们添加到相应的列表
         for (Map<String, Object> row : rows) {
             labels.add((String) row.get("m"));
             values.add(row.get("cnt").toString());
         }
+
+        //打包数据返回
         Map<String, List<String>> result = new HashMap<>();
         result.put("labels", labels);
         result.put("values", values);
         return result;
     }
 
+    //返回过去12个月的累计学生数
     private Map<String, List<String>> getStudentCumulative() {
+
+        //查询所有月份的学生记录
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
                 "SELECT DATE_FORMAT(create_time, '%Y-%m') AS m FROM student " +
                 "WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH) " +
                 "ORDER BY create_time");
+
+        //把重复的月份去重
         Set<String> monthSet = new LinkedHashSet<>();
         for (Map<String, Object> row : rows) {
             monthSet.add((String) row.get("m"));
         }
         List<String> labels = new ArrayList<>(monthSet);
+
+        //循环累计统计所有学生的数量
         List<String> values = new ArrayList<>();
         long cum = 0;
         for (String m : labels) {
@@ -63,38 +79,52 @@ public class VisualizationController {
             cum = cnt != null ? cnt : 0;
             values.add(String.valueOf(cum));
         }
+
+        //依旧打包返回
         Map<String, List<String>> result = new HashMap<>();
         result.put("labels", labels);
         result.put("values", values);
         return result;
     }
 
+    //成绩分布表
     private Map<String, List<String>> getScoreDistribution() {
+        //建列表
         List<String> labels = Arrays.asList("0-59", "60-69", "70-79", "80-89", "90-100");
         List<String> values = new ArrayList<>();
+        //把data添加进去
         values.add(String.valueOf(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM score WHERE score < 60", Long.class)));
         values.add(String.valueOf(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM score WHERE score BETWEEN 60 AND 69", Long.class)));
         values.add(String.valueOf(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM score WHERE score BETWEEN 70 AND 79", Long.class)));
         values.add(String.valueOf(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM score WHERE score BETWEEN 80 AND 89", Long.class)));
         values.add(String.valueOf(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM score WHERE score >= 90", Long.class)));
+
+        //依旧..
         Map<String, List<String>> result = new HashMap<>();
         result.put("labels", labels);
         result.put("values", values);
         return result;
     }
 
+    //平均分表
     private Map<String, List<String>> getCourseAvg() {
+        //建表
         List<String> labels = new ArrayList<>();
         List<String> values = new ArrayList<>();
+        //获取月份学生记录
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
                 "SELECT c.name, ROUND(AVG(s.score), 1) AS avg_score FROM score s " +
                 "LEFT JOIN course c ON s.course_id = c.id " +
                 "GROUP BY s.course_id ORDER BY avg_score DESC");
+
+        //把sql中拿到的data填入表
         for (Map<String, Object> row : rows) {
             labels.add((String) row.get("name"));
             Object avg = row.get("avg_score");
             values.add(avg != null ? avg.toString() : "0");
         }
+
+        //依旧..
         Map<String, List<String>> result = new HashMap<>();
         result.put("labels", labels);
         result.put("values", values);

@@ -16,6 +16,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
+    //登录：按用户名密码查询,查不到返回null,查到则生成JWT Token
     public Map<String, Object> login(String username, String password) {
         User user = userMapper.selectOne(
                 new QueryWrapper<User>().eq("username", username).eq("password", password));
@@ -26,7 +27,7 @@ public class UserService {
         result.put("user", user);
         return result;
     }
-
+    //注册：先检查用户名是否已存在,若不存在则插入
     public boolean register(User user) {
         User exist = userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername()));
         if (exist != null) return false;

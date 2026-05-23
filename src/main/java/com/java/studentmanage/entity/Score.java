@@ -5,9 +5,12 @@ import java.time.LocalDateTime;
 
 @TableName("score")
 public class Score {
+    //依旧..
     @TableId(type = IdType.AUTO)
     private Long id;
+    //外键，指向student.id
     private Long studentId;
+    //外键，指向course.id
     private Long courseId;
     private Integer score;
     private String semester;

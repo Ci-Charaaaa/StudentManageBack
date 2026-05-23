@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 @TableName("user")
 public class User {
+    //依旧主键自增
     @TableId(type = IdType.AUTO)
     private Long id;
     private String username;

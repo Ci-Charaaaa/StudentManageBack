@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 @TableName("student")
 public class Student {
+    //把id映射到主键，进而由db来实现自增
     @TableId(type = IdType.AUTO)
     private Long id;
     private String studentNo;
